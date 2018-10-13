@@ -133,6 +133,33 @@ For example, if you call the URI `http://localhost/user/profile/rludosanu/Paris`
 }
 ```
 
+### Notes
+
+This will later be enhanced by more human readable expressions such as:
+
+```
+{
+  '[alpha]': '([a-zA-Z]+)',
+  '[alphamin]': '([a-z]+)',
+  '[alphamaj]': '([A-Z]+)',
+  '[num]': '([0-9]+)',
+  '[alnum]': '([a-zA-Z0-9]+)',
+  '[alnummin]': '([a-z0-9]+)',
+  '[alnummaj]': '([A-Z0-9]+)'
+}
+```
+
+Here is an example.
+
+```
+{
+  ...
+  path: '/books/[alpha]/[num]',
+  query: ['title', 'page']
+  ...
+}
+```
+
 ## Virtual paths
 
 To create a virtual path prefix (where the path does not actually exist in the file system) for files that are served , specify a mount path for the static directory, as shown below:
