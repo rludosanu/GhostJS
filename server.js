@@ -1,4 +1,8 @@
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const url = require('url');
+const mustache = require('mustache');
 
 class GhostServer {
 	constructor(port) {
@@ -7,55 +11,118 @@ class GhostServer {
 		} else {
 			this.port = parseInt(port);
 		}
-		this.routes = [];
+		this.staticRoutes = {};
+		this.routes = {};
 		this.server = null;
+		this.mimeTypes = {
+		  '.ico': 'image/x-icon',
+		  '.html': 'text/html',
+		  '.js': 'text/javascript',
+		  '.json': 'application/json',
+		  '.css': 'text/css',
+		  '.png': 'image/png',
+		  '.jpg': 'image/jpeg',
+		  '.wav': 'audio/wav',
+		  '.mp3': 'audio/mpeg',
+		  '.svg': 'image/svg+xml',
+		  '.pdf': 'application/pdf',
+		  '.doc': 'application/msword',
+		  '.eot': 'appliaction/vnd.ms-fontobject',
+		  '.ttf': 'aplication/font-sfnt'
+		};
 	}
 
-	route(config) {
-		var self = this;
-		const { method, path, handler } = config;
+	router(routes) {
+		let self = this;
 
-		if (!method || !path || !handler) {
-			console.log('Error: Invalid route config format');
-			return;
-		} else {
-			self.routes[path] = { method, handler };
+		for (let i = 0 ; i < routes.length ; i++) {
+			let { method, path, handler } = routes[i];
+
+			if (!method || !path || !handler) {
+				continue;
+			}
+
+			if (!Object.keys(self.routes).includes(path)) {
+				self.routes[path] = {};
+			}
+
+			self.routes[path][method] = handler;
+			console.log(`Adding new route handler: ${method} ${path}`);
 		}
-
-		console.log(self.routes);
 	}
 
-	handleRequest(req, res, routes) {
-		var self = this;
-		console.log(`Handling incoming request ${req.method} ${req.url}...`);
+	render(server, template, datas = null) {
+		let self = this;
+		let directoryname = path.dirname(template);
+		let filename = path.basename(template);
+		let pathname = null;
+		let extension = null;
 
-		// If route is not defined
-		if (!self.routes[req.url]) {
-			res.writeHead(404, {'Content-Type': 'text/html'});
-			res.write(`404: ${req.method} ${req.url} ( invalid path )`);
-			res.end();
-		}
-		// If method does not match
-		else if (self.routes[req.url].method !== req.method) {
-			console.log('handleRequest: invalid method');
-			res.writeHead(404, {'Content-Type': 'text/html'});
-			res.write(`404: ${req.method} ${req.url} ( invalid method )`);
-			res.end();
-		} else if (!self.routes[req.url].handler) {
-			res.writeHead(200, {'Content-Type': 'text/html'});
-			res.write(`200: ${req.method} ${req.url}`);
-			res.end();
+		if (Object.keys(server.staticRoutes).includes(directoryname)) {
+			pathname = path.join(__dirname, server.staticRoutes[directoryname], filename);
 		} else {
-			!self.routes[req.url].handler(req, res);
+			pathname = path.join(__dirname, template);
+		}
+
+		console.log(`Fetching file: ${pathname}`);
+
+		fs.exists(pathname, function (exist) {
+			if (!exist) {
+				self.statusCode = 404;
+				self.end(`File '${filename}' not found!`);
+				return;
+			}
+
+			if (fs.statSync(pathname).isDirectory()) {
+				pathname += '/index.html';
+			}
+
+			extension = path.extname(pathname);
+
+			fs.readFile(pathname, function(error, content) {
+				if (error) {
+					self.statusCode = 500;
+					self.end(`Error getting the file '${filename}': ${error}.`);
+				} else {
+					self.setHeader('Content-type', server.mimeTypes[extension] || 'text/plain');
+					if (extension === '.html' && datas !== null && Object.keys(datas).length !== 0) {
+						self.end(mustache.render(content.toString(), datas));
+					} else {
+						self.end(content);
+					}
+				}
+			});
+		});
+	}
+
+	use(path, directory) {
+		this.staticRoutes[path] = directory;
+		console.log(`Adding new directory alias: ${path} => ${directory}`)
+	}
+
+	handleRequest(request, response) {
+		let self = this;
+
+		response.render = self.render.bind(response, self);
+		if (
+			self.routes
+			&& self.routes[request.url]
+			&& self.routes[request.url][request.method]
+		) {
+			self.routes[request.url][request.method](request, response);
+		} else {
+			self.render.bind(response, self)(request.url);
 		}
 	}
 
 	start() {
-		var self = this;
+		let self = this;
 
 		// Create the server
+		console.log('Creating HTTP server');
 		self.server = http.createServer((req, res) => {
-			self.handleRequest(req, res, self.routes);
+			console.log(`Handling request: ${req.method} ${req.url}`);
+			self.handleRequest(req, res);
 		});
 
 		// Run the server
@@ -68,14 +135,24 @@ class GhostServer {
 	}
 }
 
-server = new GhostServer(8080);
+server = new GhostServer();
 
-server.route({
+server.use('/', 'views');
+
+server.use('/css', 'css');
+
+server.router([{
 	method: 'GET',
 	path: '/',
 	handler: (req, res) => {
-		res.end('Hello World !');
+		res.render('/', { message: 'Hello World !' });
 	}
-});
+}, {
+	method: 'GET',
+	path: '/test',
+	handler: (req, res) => {
+		res.render('/test.html');
+	}
+}]);
 
 server.start();
