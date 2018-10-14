@@ -82,60 +82,11 @@ server.router([route]);
 
 ## Advanced routing
 
-### Anonymous query parameters
+The `path` property of the route object is actually interpreted by the server as a RegExp and can take two forms. It can be a pure regular expression like `([a-zA-Z]+)` or a built-in shorthand like `[alpha]`.
 
-The `path` property of the route object is actually interpreted by the server as a RegExp.
+For example, the following path `/user/profile/([a-zA-Z0-9]+)` (also written `/user/profile/[alnum]`) could match `/user/profile/rludosanu`,  `/user/profile/RazVan` or even `/user/profile/123`.
 
-For example, the following path `/user/profile/([a-zA-Z0-9]+)` could match `/user/profile/rludosanu` or `/user/profile/razvan` and so on.
-
-The matched expression(s) are stored into an ordered array accessible via your handler parameter `request` at `request.query`.
-
-```
-{
-  ...
-  path: '/user/profile/([a-zA-Z0-9]+)',
-  handler: (request, response) => {
-    // This will print out the variable captured by the parenthesis in the RegExp
-    console.log(request.query[0]);
-  }
-}
-```
-
-### Named query parameters
-
-If you wish to explicitly name you parameters, it's also possible using an extra property named `query`.
-
-```
-{
-  ...
-  path: '/user/profile/([a-zA-Z0-9]+)',
-  query: ['username'],
-  handler: (request, response) => {
-    // This will print out the variable captured by the parenthesis in the RegExp
-    console.log(request.query.username);
-  }
-}
-```
-
-Note that the order of declaration matters and is read from left to right.
-
-For example, if you call the URI `http://localhost/user/profile/rludosanu/Paris` with this configuration:
-
-```
-{
-  ...
-  path: '/user/profile/([a-zA-Z0-9]+)/([a-zA-Z0-9]+)',
-  query: ['username', 'city'],
-  handler: (request, response) => {
-    console.log(request.query.username); // Prints out "rludosanu"
-    console.log(request.query.city); // Prints out "Paris"
-  }
-}
-```
-
-### Notes
-
-This will later be enhanced by more human readable expressions such as:
+Here is a list of the currently supported shorthands.
 
 ```
 {
@@ -148,15 +99,36 @@ This will later be enhanced by more human readable expressions such as:
   '[alnummaj]': '([A-Z0-9]+)'
 }
 ```
+### Anonymous query parameters
 
-Here is an example.
+The matched expression(s) are stored into an ordered array accessible via your handler parameter `request` at `request.query`.
 
 ```
 {
   ...
-  path: '/books/[alpha]/[num]',
-  query: ['title', 'page']
+  path: '/user/profile/[alnum]',
+  handler: (request, response) => {
+    // This will print out the variable captured by the parenthesis in the RegExp
+    console.log(request.query[0]);
+  }
+}
+```
+
+### Named query parameters
+
+If you wish to explicitly name you parameters, the route object can have an extra property named `query`. Note that the order of declaration matters and is read from left to right.
+
+```
+HTTP GET localhost/books/Hyperion/14
+
+{
   ...
+  path: '/books/[alpha]/[num]',
+  query: ['title', 'page'],
+  handler: (request, response) => {
+    console.log(request.query.title); // Prints out "Hyperion"
+    console.log(request.query.page); // Prints out "14"
+  }
 }
 ```
 

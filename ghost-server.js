@@ -4,6 +4,16 @@ const path = require('path');
 const url = require('url');
 const mustache = require('mustache');
 
+String.prototype.replaceAll = function replaceAll(list) {
+	var target = this;
+	var keys = Object.keys(list);
+
+	for (i = 0 ; i < keys.length ; i++) {
+		target = target.split(keys[i]).join(list[keys[i]]);
+	}
+	return target;
+};
+
 class GhostServer {
 	constructor(port) {
 		if (typeof port === 'undefined' || parseInt(port) === 'NaN' || parseInt(port) <= 0) {
@@ -29,6 +39,15 @@ class GhostServer {
 		  '.doc': 'application/msword',
 		  '.eot': 'appliaction/vnd.ms-fontobject',
 		  '.ttf': 'aplication/font-sfnt'
+		};
+		this.pathRegExp = {
+			'[alpha]': '([a-zA-Z]+)',
+			'[alphamin]': '([a-z]+)',
+			'[alphamaj]': '([A-Z]+)',
+			'[num]': '([0-9]+)',
+			'[alnum]': '([a-zA-Z0-9]+)',
+			'[alnummin]': '([a-z0-9]+)',
+			'[alnummaj]': '([A-Z0-9]+)'
 		};
 	}
 
@@ -109,7 +128,7 @@ class GhostServer {
 
 		for (let i = 0 ; i < keys.length ; i++) {
 			let key = keys[i];
-			let path = RegExp(`^${key}$`);
+			let path = RegExp(`^${key.replaceAll(self.pathRegExp)}$`);
 
 			if (path.test(request.url)) {
 				let query = request.url.match(path).reduce((a, c) => typeof c === 'string' ? a.concat([c]) : a, []).slice(1);

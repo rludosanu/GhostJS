@@ -12,7 +12,7 @@ server.router([{
 	}
 }, {
 	method: 'GET',
-	path: '/test/([a-zA-Z0-9]{1,})/([a-zA-Z0-9]{1,})',
+	path: '/test/[num]/[alnum]',
 	query: ['name', 'city'],
 	handler: (req, res) => {
 		res.render('/test.html', {
