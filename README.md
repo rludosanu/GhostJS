@@ -184,3 +184,17 @@ res.send('Page not found', 404);
 // Send a HTTP 200 OK 'application/json' response
 res.send({ message: 'Hello World !' }, 200, 'application/json');
 ```
+
+## Cookies
+
+By default, cookies are available as a string in the `request` object at `request.headers.cookie`. GhostJS parses it and generates a key:value array accessible at `request.cookies`.
+
+```
+{
+	...
+	handler: (req, res) => {
+		// This will output an array like [ username: 'rludosanu', token: 'sdf-23ksdfm-3msdf' ]
+		console.log(req.cookies);
+	}
+}
+```

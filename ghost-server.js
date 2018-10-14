@@ -160,10 +160,10 @@ class GhostServer {
 
 			if (path.test(request.url)) {
 				let query = request.url.match(path).reduce((a, c) => typeof c === 'string' ? a.concat([c]) : a, []).slice(1);
-				let callback = self.routes[key][request.method].handler;
+				let { query: params, handler: callback } = self.routes[key][request.method];
 
-				if (callback) {
-					query = self.routes[key][request.method].query.reduce((a, c, i) => {
+				if (params && callback) {
+					query = params.reduce((a, c, i) => {
 					  a[c] = query[i];
 					  return a;
 					}, []);
@@ -188,6 +188,16 @@ class GhostServer {
 
 		// Query parameters
 		request.query = query;
+
+		// Parse cookies
+		request.cookies = [];
+		if (request.headers.hasOwnProperty('cookie')) {
+			request.cookies = request.headers.cookie.split(';').reduce((a, c) => {
+				c = c.split('=');
+				a[c[0].trim()] = c[1];
+				return a;
+			}, []);
+		}
 
 		// Render a file
 		response.render = self.render.bind(response, self);
