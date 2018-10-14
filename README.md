@@ -90,13 +90,17 @@ Here is a list of the currently supported shorthands.
 
 ```
 {
-  '[alpha]': '([a-zA-Z]+)',
-  '[alphamin]': '([a-z]+)',
-  '[alphamaj]': '([A-Z]+)',
-  '[num]': '([0-9]+)',
-  '[alnum]': '([a-zA-Z0-9]+)',
-  '[alnummin]': '([a-z0-9]+)',
-  '[alnummaj]': '([A-Z0-9]+)'
+	'[alpha]': '([a-zA-Z]+)', // Letters
+	'[alphalow]': '([a-z]+)', // Lowercase letters
+	'[alphaup]': '([A-Z]+)', // Uppercase letters
+	'[num]': '(-?[0-9]+)', // Integers
+	'[numpos]': '([1-9]+[0-9]*)', // Non-zero positive integers
+	'[alnum]': '([a-zA-Z0-9]+)', // Letters and integers
+	'[alnumlow]': '([a-z0-9]+)', // Lowercase letters and integers
+	'[alnumup]': '([A-Z0-9]+)', // Uppercase letters and integers
+	'[email]': '([\\w\\-]+(\\.[\\w\\-]+)*@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,4})', // Email address
+	'[token]': '([a-zA-Z0-9-_]+)', // Tokens
+	'[date]': '([0-9]{4}-[0-9]{2}-[0-9]{2})' // Date (YYYY-MM-DD)
 }
 ```
 ### Anonymous query parameters

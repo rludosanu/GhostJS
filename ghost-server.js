@@ -41,13 +41,28 @@ class GhostServer {
 		  '.ttf': 'aplication/font-sfnt'
 		};
 		this.pathRegExp = {
+			// Letters
 			'[alpha]': '([a-zA-Z]+)',
-			'[alphamin]': '([a-z]+)',
-			'[alphamaj]': '([A-Z]+)',
-			'[num]': '([0-9]+)',
+			// Lowercase letters
+			'[alphalow]': '([a-z]+)',
+			// Uppercase letters
+			'[alphaup]': '([A-Z]+)',
+			// Integers
+			'[num]': '(-?[0-9]+)',
+			// Non-zero positive integers
+			'[numpos]': '([1-9]+[0-9]*)',
+			// Letters and integers
 			'[alnum]': '([a-zA-Z0-9]+)',
-			'[alnummin]': '([a-z0-9]+)',
-			'[alnummaj]': '([A-Z0-9]+)'
+			// Lowercase letters and integers
+			'[alnumlow]': '([a-z0-9]+)',
+			// Uppercase letters and integers
+			'[alnumup]': '([A-Z0-9]+)',
+			// Email address
+			'[email]': '([\\w\\-]+(\\.[\\w\\-]+)*@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,4})',
+			// Tokens
+			'[token]': '([a-zA-Z0-9-_]+)',
+			// Date (YYYY-MM-DD)
+			'[date]': '([0-9]{4}-[0-9]{2}-[0-9]{2})'
 		};
 	}
 
