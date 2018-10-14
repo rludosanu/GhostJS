@@ -141,3 +141,46 @@ server.use('/css', 'src/stylesheets');
 ```
 
 This means when you request the file `/css/bootstrap.css` the server will actually fetch the file located at `src/stylesheets/bootstrap.css` on your disk.
+
+## HTTP response
+
+Two methods are available `render` and `send`, attached to the `response` object.
+
+### Render
+
+```
+render( filepath: String [, parameters: Object] )
+```
+
+The `render` method renders a view and sends the rendered HTML string to the client. It takes an optional data parameter object and uses the `Mustache` templating library.
+
+```
+// This will send the html file index.html
+handler: (req, res) => {
+	res.render('/index.html');
+}
+
+// This will send the html file index.html rendered by Mustache
+handler: (req, res) => {
+	res.render('/index.html', { message: 'Hello World !' });
+}
+```
+
+### Send
+
+```
+send( data: String|Object|Array [, status: Number [, type: String]] )
+```
+
+The `send` method sends a response with the correct content-type. If the parameter is a String object, the response is sent as is otherwise it is converted to a JSON string using JSON.stringify().
+
+```
+// Send a HTTP 200 OK 'text/html' response
+res.send('<p>Hello World !</p>');
+
+// Send a HTTP 404 NOT FOUND 'text/html' response
+res.send('Page not found', 404);
+
+// Send a HTTP 200 OK 'application/json' response
+res.send({ message: 'Hello World !' }, 200, 'application/json');
+```

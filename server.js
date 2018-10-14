@@ -22,9 +22,12 @@ server.router([{
 	}
 }, {
 	method: 'GET',
-	path: '/404',
+	path: '/user/[alpha]',
+	query: ['username'],
 	handler: (req, res) => {
-		res.render('/404.html');
+		res.send({
+			name: req.query.username
+		}, 200);
 	}
 }]);
 

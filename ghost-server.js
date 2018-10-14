@@ -73,6 +73,9 @@ class GhostServer {
 		}
 	}
 
+	/*
+	** Render a file from the disk.
+	*/
 	render(server, template, datas = null) {
 		let self = this;
 		let directoryname = path.dirname(template);
@@ -117,11 +120,36 @@ class GhostServer {
 		});
 	}
 
+	/*
+	** Send the HTTP response
+	*/
+	send(server, datas, status, type) {
+		if (!datas) {
+			return;
+		} else if (typeof datas === 'string') {
+			type = 'text/html';
+		} else {
+			type = server.mimeTypes['.' + type] || 'application/json';
+			datas = JSON.stringify(datas);
+		}
+		status = parseInt(status) || 200;
+
+		this.statusCode = status;
+		this.setHeader('Content-type', type);
+		this.end(datas);
+	}
+
+	/*
+	** Add a new virtual path
+	*/
 	use(path, directory) {
 		this.staticRoutes[path] = directory;
 		console.log(`Adding new directory alias: ${path} => ${directory}`)
 	}
 
+	/*
+	** Parse the request made to the server and return an object containing a callback handler and an array of query parameters.
+	*/
 	parseRequest(request) {
 		let self = this;
 		let keys = Object.keys(self.routes);
@@ -158,8 +186,14 @@ class GhostServer {
 		let self = this;
 		let { query, callback } = self.parseRequest(request);
 
+		// Query parameters
 		request.query = query;
+
+		// Render a file
 		response.render = self.render.bind(response, self);
+
+		// Render a variable
+		response.send = self.send.bind(response, self);
 
 		if (callback) {
 			callback(request, response);
