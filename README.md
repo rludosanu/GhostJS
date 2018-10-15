@@ -15,11 +15,11 @@ const server = require('./ghost-server')(port);
 
 // Define your index root
 server.router([{
-	method: 'GET',
-	path: '/',
-	handler: (req, res) => {
-		res.render('/');
-	}
+  method: 'GET',
+  path: '/',
+  handler: (req, res) => {
+    res.render('/');
+  }
 });
 
 // Start the server
@@ -56,11 +56,11 @@ Route definition takes the following generic structure:
 
 ```
 {
-	method: '[GET|POST|PUT|DELETE]',
-	path: '/[*]',
-	handler: (req, res) => {
-		res.render('/[*]');
-	}
+  method: '[GET|POST|PUT|DELETE]',
+  path: '/[*]',
+  handler: (req, res) => {
+    res.render('/[*]');
+  }
 }
 ```
 
@@ -68,12 +68,12 @@ To apply the previous definition, just call the `router` function like so:
 
 ```
 // Define route
-const route = {
-	method: 'GET',
-	path: '/hello',
-	handler: (req, res) => {
-		res.render('/hello.html');
-	}
+  const route = {
+  method: 'GET',
+  path: '/hello',
+  handler: (req, res) => {
+    res.render('/hello.html');
+  }
 }
 
 // Save route
@@ -90,17 +90,17 @@ Here is a list of the currently supported shorthands.
 
 ```
 {
-	'[alpha]': '([a-zA-Z]+)', // Letters
-	'[alphalow]': '([a-z]+)', // Lowercase letters
-	'[alphaup]': '([A-Z]+)', // Uppercase letters
-	'[num]': '(-?[0-9]+)', // Integers
-	'[numpos]': '([1-9]+[0-9]*)', // Non-zero positive integers
-	'[alnum]': '([a-zA-Z0-9]+)', // Letters and integers
-	'[alnumlow]': '([a-z0-9]+)', // Lowercase letters and integers
-	'[alnumup]': '([A-Z0-9]+)', // Uppercase letters and integers
-	'[email]': '([\\w\\-]+(\\.[\\w\\-]+)*@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,4})', // Email address
-	'[token]': '([a-zA-Z0-9-_]+)', // Tokens
-	'[date]': '([0-9]{4}-[0-9]{2}-[0-9]{2})' // Date (YYYY-MM-DD)
+  '[alpha]': '([a-zA-Z]+)', // Letters
+  '[alphalow]': '([a-z]+)', // Lowercase letters
+  '[alphaup]': '([A-Z]+)', // Uppercase letters
+  '[num]': '(-?[0-9]+)', // Integers
+  '[numpos]': '([1-9]+[0-9]*)', // Non-zero positive integers
+  '[alnum]': '([a-zA-Z0-9]+)', // Letters and integers
+  '[alnumlow]': '([a-z0-9]+)', // Lowercase letters and integers
+  '[alnumup]': '([A-Z0-9]+)', // Uppercase letters and integers
+  '[email]': '([\\w\\-]+(\\.[\\w\\-]+)*@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,4})', // Email address
+  '[token]': '([a-zA-Z0-9-_]+)', // Tokens
+  '[date]': '([0-9]{4}-[0-9]{2}-[0-9]{2})' // Date (YYYY-MM-DD)
 }
 ```
 ### Anonymous query parameters
@@ -161,12 +161,12 @@ The `render` method renders a view and sends the rendered HTML string to the cli
 ```
 // This will send the html file index.html
 handler: (req, res) => {
-	res.render('/index.html');
+  res.render('/index.html');
 }
 
 // This will send the html file index.html rendered by Mustache
 handler: (req, res) => {
-	res.render('/index.html', { message: 'Hello World !' });
+  res.render('/index.html', { message: 'Hello World !' });
 }
 ```
 
@@ -195,10 +195,10 @@ By default, cookies are available as a string in the `request` object at `reques
 
 ```
 {
-	...
-	handler: (req, res) => {
-		// This will output an array like [ username: 'rludosanu', token: 'sdf-23ksdfm-3msdf' ]
-		console.log(req.cookies);
-	}
+  ...
+  handler: (req, res) => {
+    // This will output an array like [ username: 'rludosanu', token: 'sdf-23ksdfm-3msdf' ]
+    console.log(req.cookies);
+  }
 }
 ```
