@@ -15,12 +15,11 @@ String.prototype.replaceAll = function replaceAll(list) {
 };
 
 class GhostServer {
-	constructor(port) {
-		if (typeof port === 'undefined' || parseInt(port) === 'NaN' || parseInt(port) <= 0) {
-			this.port = 8080;
-		} else {
-			this.port = parseInt(port);
-		}
+	constructor(options) {
+		this.options = {
+			port: parseInt(options.port) || 3000,
+			debug: options.debug || true
+		};
 		this.staticRoutes = {};
 		this.routes = {};
 		this.server = null;
@@ -66,6 +65,18 @@ class GhostServer {
 		};
 	}
 
+	/*
+	** Logs debug message into the consol
+	*/
+	debug(log) {
+		if (this.options.debug) {
+			console.log(log);
+		}
+	}
+
+	/*
+	** Sets up a route
+	*/
 	router(routes) {
 		let self = this;
 
@@ -84,12 +95,12 @@ class GhostServer {
 				handler: handler,
 				query: (routes[i].hasOwnProperty('query')) ? routes[i].query : null
 			};
-			console.log(`Adding new route handler: ${method} ${path}`);
+			self.debug(`Adding new route handler: ${method} ${path}`);
 		}
 	}
 
 	/*
-	** Render a file from the disk.
+	** Renders a file from the disk
 	*/
 	render(server, template, datas = null) {
 		let self = this;
@@ -104,7 +115,7 @@ class GhostServer {
 		} else {
 			pathname = path.join(__dirname, template);
 		}
-		console.log(`Fetching file: ${pathname}`);
+		server.debug(`Fetching file: ${pathname}`);
 
 		fs.exists(pathname, function (exist) {
 			if (!exist) {
@@ -136,7 +147,7 @@ class GhostServer {
 	}
 
 	/*
-	** Send the HTTP response
+	** Sends the HTTP response
 	*/
 	send(server, datas, status, type) {
 		if (!datas) {
@@ -155,15 +166,15 @@ class GhostServer {
 	}
 
 	/*
-	** Add a new virtual path
+	** Adds a virtual directory path
 	*/
 	use(path, directory) {
 		this.staticRoutes[path] = directory;
-		console.log(`Adding new directory alias: ${path} => ${directory}`)
+		this.debug(`Adding new directory alias: ${path} => ${directory}`)
 	}
 
 	/*
-	** Parse the request made to the server and return an object containing a callback handler and an array of query parameters.
+	** Parses the request made to the server and return an object containing a callback handler and an array of query parameters.
 	*/
 	parseRequest(request) {
 		let self = this;
@@ -197,6 +208,9 @@ class GhostServer {
 		};
 	}
 
+	/*
+	**
+	*/
 	handleRequest(request, response) {
 		let self = this;
 		let { query, callback } = self.parseRequest(request);
@@ -230,17 +244,17 @@ class GhostServer {
 	start() {
 		let self = this;
 
-		console.log('Creating HTTP server');
+		self.debug('Creating HTTP server');
 		self.server = http.createServer((req, res) => {
-			console.log(`Handling request: ${req.method} ${req.url}`);
+			self.debug(`Handling request: ${req.method} ${req.url}`);
 			self.handleRequest(req, res);
 		});
 
-		self.server.listen(self.port, (error) => {
+		self.server.listen(self.options.port, (error) => {
 			if (error) {
 				return console.error(error);
 			}
-			console.log(`HTTP server is up and running on port ${self.port}`);
+			self.debug(`HTTP server is up and running on port ${self.options.port}`);
 		});
 	}
 }

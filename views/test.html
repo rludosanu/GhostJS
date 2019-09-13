@@ -5,5 +5,13 @@
   </head>
   <body>
     <p>Hello {{name}} ! Are you from {{city}} ?</p>
+
+    <script>
+    document.cookie = "test=test;path=/test";
+    document.cookie = "name=razvan;path=/hello";
+    document.cookie = "age=28";
+    console.log(document.cookie);
+    console.log('Hello World !');
+    </script>
   </body>
 </html>

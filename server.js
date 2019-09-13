@@ -1,4 +1,7 @@
-const server = require('./ghost-server')(3000);
+const server = require('./ghost-server')({
+	port: 3000,
+	debug: true
+});
 
 server.use('/', 'views');
 
@@ -12,13 +15,10 @@ server.router([{
 	}
 }, {
 	method: 'GET',
-	path: '/test/[num]/[alnum]',
-	query: ['name', 'city'],
+	path: '/test',
 	handler: (req, res) => {
-		res.render('/test.html', {
-			name: req.query.name,
-			city: req.query.city
-		});
+		console.log(req.cookies);
+		res.render('/test.html');
 	}
 }, {
 	method: 'GET',
